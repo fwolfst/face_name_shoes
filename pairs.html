@@ -56,7 +56,17 @@
 
     let trairs = ['annika_a', 'annika_i', 'chironya', 'christoph_g', 'christoph_s', 'edi', 'felix']
 
-    let foundPairs = 0;
+    function reset() {
+      // shuffle
+      // timer
+      // missing pairs
+      // selection
+    }
+
+    // TODO zoom buttons
+    // TODO win screen
+    // TODO 2 of 3 
+
     let missingPairs = trairs.length;
 
     let timerSeconds = 0;
@@ -83,10 +93,22 @@
       const card = document.createElement('div');
       card.id = id;
 
-      card.textContent = name;
+      if (name) {
+        const name_parts = name.split("_");
+        let display_name = name_parts.map(x => x[0].toUpperCase() + x.slice(1, x.length)).join(" ")
+        card.textContent = display_name;
+      }
       card.classList.add("card");
       card.style.backgroundImage = `url("${bg_image}")`
       card.addEventListener('click', () => {
+        // TODO toggle / remove if already in selected.
+
+        // // If already selected, do nothing; to toggle, change this behavior
+        // if (!selection.includes(v)) {
+        //   selection.push(v);
+        //   el.classList.add('selected');
+        //   updateSelectionView();
+        // }
         selected.push(card);
         card.classList.add('selected');
         if (selected.length == 3) {
@@ -96,15 +118,20 @@
 
           let names = selected.map(i => i.id.slice(0, i.id.lastIndexOf("_")))
           if (new Set(names).size == 1) {
-            console.log("MATCH");
             selected.forEach(e => e.classList.add("checked"));
             selected.forEach(e => (e.onclick = null));
+            // TODO remove onclick handler
             // removing click handler doesnt work for whatever reason
             //const clone = el.cloneNode(true);
             //el.replaceWith(clone);
-            foundPairs += 1;
-            //if foundPairs == 
+
+            missingPairs -= 1;
+
             updateStats();
+
+            if (missingPairs == 0) {
+              //
+            }
 
           } else {
             // remove selection class
@@ -112,22 +139,13 @@
 
           selected = [];
         }
-        console.log(selected);
-        // const v = Number(el.dataset.value);
-
-        // // If already selected, do nothing; to toggle, change this behavior
-        // if (!selection.includes(v)) {
-        //   selection.push(v);
-        //   el.classList.add('selected');
-        //   updateSelectionView();
-        // }
       });
 
       document.getElementById("field").appendChild(card);
     });
 
     function updateStats() {
-      document.getElementById("stats").textContent = "Found " + foundPairs + " / " + missingPairs;
+      document.getElementById("stats").textContent = "Noch " + missingPairs + "!";
     }
 
     updateStats();
