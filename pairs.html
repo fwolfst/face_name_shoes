@@ -1,0 +1,137 @@
+<html>
+  <head>
+    <style>
+    header {
+      margin-bottom: 10px;
+    }
+    .field {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 25px;
+    }
+    .card {
+      width: 300px;
+      min-height: 300px;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      text-align: center;
+      align-content: center;
+      border: 2px solid grey;
+      border-radius: 10px;
+      box-shadow: 2px 2px 9px 9px #AAA;
+    }
+    .selected {
+      border: 3px solid red;
+    }
+    .checked {
+      border: 1px solid gray;
+      filter: blur(4px) contrast(0.8); /* will blur text too */
+    }
+    .stats {
+      float: left;
+    }
+    .timer {
+      float: right;
+    }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div id="stats" class="stats"></div>
+      <div>Finde die Matches (Name, Portrait, Untenrum)</div>
+      <div id="timer" class="timer"></div>
+    </header>
+
+    <div id="field" class="field"></div>
+
+    <script>
+    function shuffleInPlace(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    let trairs = ['annika_a', 'annika_i', 'chironya', 'christoph_g', 'christoph_s', 'edi', 'felix']
+
+    let foundPairs = 0;
+    let missingPairs = trairs.length;
+
+    let timerSeconds = 0;
+
+    let timerId = setInterval(() => {
+      timerSeconds += 1;
+      document.getElementById("timer").textContent = timerSeconds + " Sekunden"
+    }, 1000);
+
+    let cards = []
+
+    trairs.forEach((name) => {
+      // ID, display string, image
+      cards.push([name + "_name", name, null])
+      cards.push([name + "_portrait", '', name + "_portrait.JPG"])
+      cards.push([name + "_shoes", '', name + '_shoes.JPG'])
+    })
+
+    shuffleInPlace(cards);
+
+    let selected = [];
+
+    cards.forEach(([id, name, bg_image]) => {
+      const card = document.createElement('div');
+      card.id = id;
+
+      card.textContent = name;
+      card.classList.add("card");
+      card.style.backgroundImage = `url("${bg_image}")`
+      card.addEventListener('click', () => {
+        selected.push(card);
+        card.classList.add('selected');
+        if (selected.length == 3) {
+          // if selected.every ..
+          // mark stuff
+          selected.forEach(e => e.classList.remove("selected"));
+
+          let names = selected.map(i => i.id.slice(0, i.id.lastIndexOf("_")))
+          if (new Set(names).size == 1) {
+            console.log("MATCH");
+            selected.forEach(e => e.classList.add("checked"));
+            selected.forEach(e => (e.onclick = null));
+            // removing click handler doesnt work for whatever reason
+            //const clone = el.cloneNode(true);
+            //el.replaceWith(clone);
+            foundPairs += 1;
+            //if foundPairs == 
+            updateStats();
+
+          } else {
+            // remove selection class
+          }
+
+          selected = [];
+        }
+        console.log(selected);
+        // const v = Number(el.dataset.value);
+
+        // // If already selected, do nothing; to toggle, change this behavior
+        // if (!selection.includes(v)) {
+        //   selection.push(v);
+        //   el.classList.add('selected');
+        //   updateSelectionView();
+        // }
+      });
+
+      document.getElementById("field").appendChild(card);
+    });
+
+    function updateStats() {
+      document.getElementById("stats").textContent = "Found " + foundPairs + " / " + missingPairs;
+    }
+
+    updateStats();
+
+    </script>
+  </body>
+</html>
