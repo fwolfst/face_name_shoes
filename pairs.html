@@ -1,8 +1,29 @@
 <html>
   <head>
     <style>
+    :root {
+      --header-height: 128px;
+      padding: 10px;
+      font-family: 'Arial';
+    }
     header {
+      position: fixed;
+      inset: 0 0 auto 0;
+      height: var(--header-height);
+      width: 100%;
       margin-bottom: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      background: white;
+      padding-left: 15px;
+      padding-right: 15px;
+      text-align: center;
+    }
+    main {
+      margin-top: var(--header-height);
+      padding: 10px;
+      font-family: 'Brush Script MT', cursive;
+      font-size: 3rem;
+      width: 100%;
     }
     .field {
       display: grid;
@@ -28,22 +49,29 @@
       border: 1px solid gray;
       filter: blur(4px) contrast(0.8); /* will blur text too */
     }
+    .statrow {
+      display: flex;
+      justify-content: space-around;
+    }
     .stats {
-      float: left;
     }
     .timer {
-      float: right;
     }
     </style>
   </head>
   <body>
     <header>
-      <div id="stats" class="stats"></div>
-      <div>Finde die Matches (Name, Portrait, Untenrum)</div>
-      <div id="timer" class="timer"></div>
+      <h1>Finde die Matches (Name, Portrait, Untenrum)</h1>
+      <div class="statrow">
+        <div id="stats" class="stats"></div>
+        <div id="state" class="state"></div>
+        <div id="timer" class="timer"></div>
+      </div>
     </header>
 
-    <div id="field" class="field"></div>
+    <main>
+      <div id="field" class="field"></div>
+    </main>
 
     <script>
     function shuffleInPlace(array) {
@@ -101,14 +129,13 @@
       card.classList.add("card");
       card.style.backgroundImage = `url("${bg_image}")`
       card.addEventListener('click', () => {
-        // TODO toggle / remove if already in selected.
 
-        // // If already selected, do nothing; to toggle, change this behavior
-        // if (!selection.includes(v)) {
-        //   selection.push(v);
-        //   el.classList.add('selected');
-        //   updateSelectionView();
-        // }
+        if (selected.includes(card)) {
+          card.classList.remove("selected");
+          selected.remove(card);
+          return;
+        }
+
         selected.push(card);
         card.classList.add('selected');
         if (selected.length == 3) {
