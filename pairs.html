@@ -17,6 +17,7 @@
       padding-left: 15px;
       padding-right: 15px;
       text-align: center;
+      z-index: 100;
     }
     main {
       margin-top: var(--header-height);
@@ -38,22 +39,35 @@
       background-repeat: no-repeat;
       text-align: center;
       align-content: center;
-      border: 2px solid grey;
+      border: 4px solid white;
       border-radius: 10px;
-      box-shadow: 2px 2px 9px 9px #AAA;
+      box-shadow: 1px 1px 6px 6px #CCC;
     }
     .selected {
-      border: 3px solid red;
+      border: 4px solid green;
+      box-shadow: 2px 2px 14px 14px #AAA;
+    }
+    .no_match {
+      border: 4px solid red;
+      box-shadow: 2px 2px 7px 7px #FAA;
+    }
+    .two_of_three {
+      border: 4px solid orange;
+      box-shadow: 2px 2px 7px 7px #FFA;
     }
     .checked {
       border: 1px solid gray;
-      filter: blur(4px) contrast(0.8); /* will blur text too */
+      filter: blur(5px) contrast(0.7); /* will blur text too */
     }
     .statrow {
       display: flex;
       justify-content: space-around;
     }
     .stats {
+    }
+    .state {
+      color: green;
+      font-size: 14rem;
     }
     .timer {
     }
@@ -82,18 +96,19 @@
       return array;
     }
 
-    let trairs = ['annika_a', 'annika_i', 'chironya', 'christoph_g', 'christoph_s', 'edi', 'felix']
+    let trairs = ['annika_a', 'annika_i', 'chironya', 'christoph_g', 'christoph_s', 'edi', 'fay', 'felix', 'ita', 'jannes', 'jñana', 'joel', 'johanna', 'johannes', 'jörg_r', 'julia_k', 'julian', 'jürgen', 'karina']
 
     function reset() {
-      // shuffle
-      // timer
-      // missing pairs
-      // selection
+      // TODO shuffle
+      // TODO timer
+      // TODO missing pairs
+      // TODO selection
     }
 
     // TODO zoom buttons
     // TODO win screen
-    // TODO 2 of 3 
+    // TODO hide completed (or move them down)
+    // TODO show solution / correct pairs
 
     let missingPairs = trairs.length;
 
@@ -115,7 +130,7 @@
 
     shuffleInPlace(cards);
 
-    let selected = [];
+    let selected = new Set();
 
     cards.forEach(([id, name, bg_image]) => {
       const card = document.createElement('div');
@@ -129,21 +144,24 @@
       card.classList.add("card");
       card.style.backgroundImage = `url("${bg_image}")`
       card.addEventListener('click', () => {
+        card.classList.remove("two_of_three");
 
-        if (selected.includes(card)) {
+        // Toggle selection
+        if (selected.has(card)) {
           card.classList.remove("selected");
-          selected.remove(card);
+          selected.delete(card);
           return;
         }
 
-        selected.push(card);
+        selected.add(card);
         card.classList.add('selected');
-        if (selected.length == 3) {
-          // if selected.every ..
-          // mark stuff
-          selected.forEach(e => e.classList.remove("selected"));
+        if (selected.size == 3) {
+          Array.from(document.getElementsByClassName("two_of_three")).forEach(e => e.classList.remove("two_of_three"));
+          Array.from(document.getElementsByClassName("selected")).forEach(e => e.classList.remove("selected"));
+          Array.from(document.getElementsByClassName("no_match")).forEach(e => e.classList.remove("no_match"));
+          // selected.forEach(e => e.classList.remove("selected"));
 
-          let names = selected.map(i => i.id.slice(0, i.id.lastIndexOf("_")))
+          let names = [...selected].map(i => i.id.slice(0, i.id.lastIndexOf("_")))
           if (new Set(names).size == 1) {
             selected.forEach(e => e.classList.add("checked"));
             selected.forEach(e => (e.onclick = null));
@@ -157,14 +175,19 @@
             updateStats();
 
             if (missingPairs == 0) {
-              //
+              document.getElementById("state").textContent = "Geschafft nach " + timerSeconds + " Sekunden!"
+              clearInterval(timerId);
+              // TODO add "replay/reset" button
             }
 
-          } else {
-            // remove selection class
+          } else if (new Set(names).size == 2) {
+            //document.getElementById("state").textContent = "Zwei richtige!"
+            selected.forEach(e => e.classList.add("two_of_three"));
+          } else if (new Set(names).size == 3) {
+            selected.forEach(e => e.classList.add("no_match"));
           }
 
-          selected = [];
+          selected = new Set();
         }
       });
 
