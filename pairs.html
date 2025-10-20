@@ -3,6 +3,7 @@
     <style>
     :root {
       --header-height: 128px;
+      --matched-card-display: inherit;
       padding: 10px;
       font-family: 'Arial';
     }
@@ -56,6 +57,7 @@
       box-shadow: 2px 2px 7px 7px #FFA;
     }
     .checked {
+      display: var(--matched-card-display);
       border: 1px solid gray;
       filter: blur(5px) contrast(0.7); /* will blur text too */
     }
@@ -78,6 +80,10 @@
       <h1>Finde die Matches (Name, Portrait, Untenrum)</h1>
       <div class="statrow">
         <div id="stats" class="stats"></div>
+        <div id="hider" class="hider">
+          <input type="checkbox" id="hide_matched">
+          <label for="hide_matched">Fertige ausblenden</label>
+        </div>
         <div id="state" class="state"></div>
         <div id="timer" class="timer"></div>
       </div>
@@ -107,8 +113,6 @@
 
     // TODO zoom buttons
     // TODO win screen
-    // TODO hide completed (or move them down)
-    // TODO show solution / correct pairs
 
     let missingPairs = trairs.length;
 
@@ -197,6 +201,14 @@
     function updateStats() {
       document.getElementById("stats").textContent = "Noch " + missingPairs + "!";
     }
+
+    document.getElementById("hide_matched").addEventListener('click', (e) => {
+      if (e.target.checked) {
+        document.documentElement.style.setProperty('--matched-card-display', 'none');
+      } else {
+        document.documentElement.style.setProperty('--matched-card-display', 'inherit');
+      }
+    });
 
     updateStats();
 
